@@ -1,0 +1,52 @@
+FUNCION add
+
+sum = letrec sum : Nat -> Nat -> Nat =
+  lambda n : Nat. lambda m : Nat. 
+  if iszero n then m 
+  else succ (sum (pred n) m)
+in
+  sum
+;;
+
+sub = letrec sub : Nat -> Nat -> Nat =
+  lambda n : Nat. lambda m : Nat.
+    if iszero m then n
+    else if iszero n then m
+    else sub (pred n) (pred m)
+in
+  sub
+;;
+
+is_greater = letrec is_greater : Nat -> Nat -> Bool =
+  lambda m : Nat. lambda n : Nat.
+    if iszero m then false
+    else if iszero n then true
+    else is_greater (pred m) (pred n)
+in
+  is_greater
+;;
+
+add = letrec add : Int -> Int -> Int = 
+  lambda x : Int. lambda y : Int.
+  case x of
+    <pos=p1> =>
+      (case y of
+          <pos=p2> => <pos=(sum p1 p2)> as Int
+        | <zero=z2> => <pos=p1> as Int
+        | <neg=n2> => 
+          if (is_greater p1 n2) then  <pos=(sub p1 n2)> as Int
+          else  <neg=(sub p1 n2)> as Int)
+  | <zero=z1> =>
+      (case y of
+          <pos=p2> => <pos=p2> as Int
+        | <zero=z2> => <zero=true> as Int
+        | <neg=n2> => <neg=n2> as Int)
+  | <neg=n1> =>
+      (case y of
+          <pos=p2> =>
+          if (is_greater p2 n1) then  <pos=(sub p2 n1)> as Int
+          else  <neg=(sub p2 n1)> as Int
+        | <zero=z2> => <neg=n1> as Int
+        | <neg=n2> => <neg=(sum n1 n2)> as Int)
+in add
+;;

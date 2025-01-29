@@ -1,0 +1,350 @@
+true
+let x = true in x
+if false then true else false
+0
+succ (succ (succ 0))
+3
+succ (pred 0)
+iszero (pred (succ (succ 0)))
+if iszero 3 then 0 else 1
+iszero true
+if 1 then true else false
+if iszero 3 then 0 else false
+let id = Lx.x in id 3
+let id_bool = L x:Bool. x in id_bool true
+let id_nat = L x:Nat. x in id_nat 5
+let x = 5 in let id_nat = L x:Nat. x in id_nat x
+let fix = lambda f.(lambda x. f (lambda y. x x y)) (lambda x. f (lambda y. x x y)) in let sumaux = lambda f. (lambda n. (lambda m. if (iszero n) then m else succ (f (pred n) m))) in let sum = fix sumaux in sum 21 34
+let fix = lambda f.(lambda x. f (lambda y. x x y)) (lambda x. f (lambda y. x x y)) in let sumaux = lambda f. (lambda n. (lambda m. if (iszero n) then m else succ (f (pred n) m))) in let sum = fix sumaux in let prodaux = lambda f. (lambda n. (lambda m. if (iszero m) then 0 else sum n (f n (pred m)))) in let prod = fix prodaux in prod 12 5
+
+(*******************Multi-line Expressions*******************)
+
+let
+        x = 1
+in
+        succ x;;
+
+(*****************Internal Fixed-Point Combinator *********)
+
+letrec sum: Nat -> Nat -> Nat = 
+        lambda n : Nat. lambda m : Nat. if iszero n then m else succ(sum (pred n) m)
+    in sum 21 34;;
+
+let prod =
+        lambda n : Nat. lambda m : Nat. 
+            (letrec aux : Nat -> Nat -> Nat -> Nat = lambda n : Nat. lambda m : Nat. lambda k : Nat.
+                if iszero n then 0
+                else if iszero (pred n) then m
+                    else (aux (pred n) (letrec sum : Nat -> Nat -> Nat =
+                                    lambda i : Nat. lambda j : Nat. if iszero i then j else succ (sum (pred i) j) 
+                                    in sum m k) k)
+        in aux n m m)
+    in prod 2 16;;
+
+let fib =
+        lambda n : Nat.
+            (letrec aux : Nat -> Nat -> Nat -> Nat = lambda n : Nat. lambda a : Nat. lambda b : Nat.
+                if iszero n then a
+                else (aux (pred n) (letrec sum : Nat -> Nat -> Nat =
+                                    lambda i : Nat. lambda j : Nat. if iszero i then j else succ (sum (pred i) j) 
+                                    in sum a b) a)
+            in aux n 0 1
+            )
+    in fib 8;;
+
+let fact = 
+        lambda n : Nat.
+            (letrec factaux : Nat -> Nat -> Nat = lambda n : Nat. lambda acc : Nat.
+                if iszero (pred n) then acc
+                else (factaux (pred n) (
+                    letrec prod : Nat -> Nat -> Nat -> Nat = lambda p : Nat. lambda q : Nat. lambda k : Nat.
+                        if iszero p then 1
+                        else if iszero (pred p) then q
+                            else (prod (pred p) (letrec sum :  Nat -> Nat -> Nat = 
+                                    lambda i : Nat. lambda j : Nat.
+                                    if iszero i then j else succ(sum (pred i) j)
+                                in sum q k) k)
+                    in prod n acc acc))           
+            in factaux n 1)
+    in fact 5;;
+    
+(*******************Pretty-Printer*******************)
+
+lambda x : Nat. x;;
+
+letrec sum: Nat -> Nat -> Nat = 
+        lambda n : Nat. lambda m : Nat. if iszero n then m else succ(sum (pred n) m)
+    in sum;;
+
+(*Combinador de punto fijo interno*)
+
+letrec sum: Nat -> Nat -> Nat = 
+        lambda n : Nat. lambda m : Nat. if iszero n then m else succ(sum (pred n) m)
+    in sum 21 34;;
+
+(*PROD*)
+
+  let prod =
+        lambda n : Nat. lambda m : Nat. 
+            (letrec aux : Nat -> Nat -> Nat -> Nat = lambda n : Nat. lambda m : Nat. lambda k : Nat.
+                if iszero n then 0
+                else if iszero (pred n) then m
+                    else (aux (pred n) (letrec sum : Nat -> Nat -> Nat =
+                                    lambda i : Nat. lambda j : Nat. if iszero i then j else succ (sum (pred i) j) 
+                                    in sum m k) k)
+        in aux n m m)
+    in prod 2 16;;
+
+(*FIB*)
+
+ let fib =
+        lambda n : Nat.
+            (letrec aux : Nat -> Nat -> Nat -> Nat = lambda n : Nat. lambda a : Nat. lambda b : Nat.
+                if iszero n then a
+                else (aux (pred n) (letrec sum : Nat -> Nat -> Nat =
+                                    lambda i : Nat. lambda j : Nat. if iszero i then j else succ (sum (pred i) j) 
+                                    in sum a b) a)
+            in aux n 0 1
+            )
+    in fib 8;;
+
+(*FACT*)
+let fact = 
+        lambda n : Nat.
+            (letrec factaux : Nat -> Nat -> Nat = lambda n : Nat. lambda acc : Nat.
+                if iszero (pred n) then acc
+                else (factaux (pred n) (
+                    letrec prod : Nat -> Nat -> Nat -> Nat = lambda p : Nat. lambda q : Nat. lambda k : Nat.
+                        if iszero p then 1
+                        else if iszero (pred p) then q
+                            else (prod (pred p) (letrec sum :  Nat -> Nat -> Nat = 
+                                    lambda i : Nat. lambda j : Nat.
+                                    if iszero i then j else succ(sum (pred i) j)
+                                in sum q k) k)
+                    in prod n acc acc))           
+            in factaux n 1)
+    in fact 5;;
+
+
+(********Global Definitions Context*******)
+y = 3;;
+
+x = 2;;
+
+letrec sum: Nat -> Nat -> Nat = 
+        lambda n : Nat. lambda m : Nat. if iszero n then m else succ(sum (pred n) m)
+    in sum x y;;
+
+succ(y);;
+
+x = true;;
+
+N = Nat;;
+
+X = Bool;;
+
+let id_bool = L x:X. x in id_bool true;;
+
+
+(*******************String Type*******************)
+
+"a";;
+
+x="abc";;  
+
+length x;;
+
+concat "a" "b";;
+
+lambda s : String. s ;;
+
+(lambda s : String. s) "abc";;
+
+letrec replicate : String -> Nat -> String = 
+        lambda s : String. lambda n : Nat.
+            if iszero n then "" else concat s (replicate s (pred n))
+    in
+        replicate "abc" 3
+    ;;
+
+
+(*******************Tuples*******************)
+
+x = {1,2,3,"hola"};;
+
+y = {"uno","dos"};;
+
+tuple2 = {x,y};;
+
+tuple2.2;;
+
+tuple2.1;;
+
+tuple2.1.1;;
+
+f = L x:Nat.x;;
+
+g = L x:String.x;;
+
+tuple = {f 3, g "hola", "mundo"};;
+
+
+(*******************Records*******************)
+
+a=5;;
+
+b={x=31,y=a};;
+
+b.x;;
+
+test1 = {x = 2, y = "hola", z = 77};;
+
+test1.y;;
+
+
+(*******************Variants*******************)
+
+Int = <pos:Nat, zero:Bool, neg:Nat>;;
+
+p3 = <pos=3> as Int;;
+
+z0 = <zero=true> as Int;;
+
+n5 = <neg=5> as Int;;
+
+abs = L i : Int.
+case i of
+<pos=p> => (<pos=p> as Int)
+| <zero=z> => (<zero=true> as Int)
+| <neg=n> => (<pos=n> as Int);;
+
+abs p3;;
+
+abs z0;;
+
+abs n5;;
+
+sum = letrec sum : Nat -> Nat -> Nat =
+  lambda n : Nat. lambda m : Nat. 
+  if iszero n then m 
+  else succ (sum (pred n) m)
+in
+  sum
+;;
+
+sub = letrec sub : Nat -> Nat -> Nat =
+  lambda n : Nat. lambda m : Nat.
+    if iszero m then n
+    else if iszero n then m
+    else sub (pred n) (pred m)
+in
+  sub
+;;
+
+is_greater = letrec is_greater : Nat -> Nat -> Bool =
+  lambda m : Nat. lambda n : Nat.
+    if iszero m then false
+    else if iszero n then true
+    else is_greater (pred m) (pred n)
+in
+  is_greater
+;;
+
+add = letrec add : Int -> Int -> Int = 
+  lambda x : Int. lambda y : Int.
+  case x of
+    <pos=p1> =>
+      (case y of
+          <pos=p2> => <pos=(sum p1 p2)> as Int
+        | <zero=z2> => <pos=p1> as Int
+        | <neg=n2> => 
+          if (is_greater p1 n2) then  <pos=(sub p1 n2)> as Int
+          else  <neg=(sub p1 n2)> as Int)
+  | <zero=z1> =>
+      (case y of
+          <pos=p2> => <pos=p2> as Int
+        | <zero=z2> => <zero=true> as Int
+        | <neg=n2> => <neg=n2> as Int)
+  | <neg=n1> =>
+      (case y of
+          <pos=p2> =>
+          if (is_greater p2 n1) then  <pos=(sub p2 n1)> as Int
+          else  <neg=(sub p2 n1)> as Int
+        | <zero=z2> => <neg=n1> as Int
+        | <neg=n2> => <neg=(sum n1 n2)> as Int)
+in add
+;;
+
+(*******************Lists*******************)
+
+lstnil = nil[Nat];;
+
+x = 4;;
+
+lst1 = cons[Nat] 2 (cons[Nat] 3 (nil[Nat]));;
+
+lst2 = cons[Nat] 4 (cons[Nat] 5 (nil[Nat]));;
+
+lst3 = cons[Nat] x (nil[Nat]);;
+
+head[Nat] lst1;;
+
+tail[Nat] lst1;;
+
+isnil[Nat] lstnil;;
+
+cons[Nat] 3 nil[Nat];;
+
+cons[Nat] 5 (cons[Nat] 3 nil[Nat]);;
+
+(*map*)
+
+letrec map : List[Nat] -> (Nat -> Nat) -> List[Nat] =
+lambda lst: List[Nat]. lambda f: (Nat -> Nat). 
+        if (isnil[Nat] (tail[Nat] lst)) then
+                cons[Nat] (f (head[Nat] lst)) (nil[Nat])
+        else
+                cons[Nat] (f (head[Nat] lst)) (map (tail[Nat] lst) f)
+in map lst1 f;;
+
+(*append*)
+
+letrec append: List[Nat] -> List[Nat] -> List[Nat] =
+lambda l1: List[Nat]. lambda l2: List[Nat].
+        if isnil[Nat] l1 then 
+                l2
+        else 
+                cons[Nat] (head[Nat] l1) (append (tail[Nat] l1) l2) 
+in append lst1 lst2;;
+
+(*length*)
+
+>> length = letrec len : (List[Nat]) -> Nat = lambda l : List[Nat]. if (isnil[Nat] l) then 0 else (succ (len (tail[Nat] l)))
+in len lst1;;
+
+(*******************Subtyping*******************)
+
+b = {x=1, y=1, z=a};;
+
+b = {x = 1, y = 1, z = a};;
+
+let idr = lambda r:{}. r in idr {x=0, y=1};;
+
+a = {x=1, y=1, z={x=1}};;
+
+b = {x=1, y=1, z=a};;
+
+
+(*devuelve el registro con un nuevo campo añadido y transforma registros de tipo {x: Nat, y: Bool} a {x: Nat, y: Bool, z: String}*)
+
+f1 = L r: {x:Nat, y:Bool}. {x=r.x, y=r.y, z="nuevocampo"};; 
+f2 = L ft: {x:Nat, y:Bool} -> {x:Nat, y:Bool, z:String}. L r: {x:Nat, y:Bool}. ft r;; 
+f2 f1 {x=1, y=false};;
+
+
+(*devuelve un registro con solo dos campos* y filtra registros de {a: Nat, b: Bool, c: String} a {a: Nat, b: Bool}.*)
+
+f3 = L r: {a:Nat, b:Bool, c:String}. {a=r.a, b=r.b};; 
+f4 = L ft: {a:Nat, b:Bool, c:String} -> {a:Nat, b:Bool}. L r: {a:Nat, b:Bool, c:String}. ft r;; 
+f4 f3 {a=1, b=true, c="hola", d=0};;
+
